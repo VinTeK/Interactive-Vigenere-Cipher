@@ -5,17 +5,6 @@ from curses import wrapper # prevents screwing up the terminal on exception
 
 ####FUNCTIONS##################################################################
 
-def findPunct(s):
-    ''' Return a list of (index, punctuation) in this string. '''
-    return [(m.start(), s[m.start()]) for m in re.finditer(r'\W', s)]
-
-def insertPunct(s, xs):
-    ''' Return a new string with punctation inserted according to xs. '''
-    ret = [ch for ch in s]
-    for x in xs:
-        ret.insert(x[0], x[1])
-    return "".join(ret)
-
 def getPosOfIndex(xs, index):
     ''' Return a (row, col) pair corresponding to an index into a 2D list. '''
     if index < 0 or index >= sum(map(len, xs)):
@@ -73,7 +62,7 @@ def decipher(ciphertext, key):
         ret.append(p)
     return "".join(ret)
 
-def printMessage(window, ciphertext, spaces, key, index, highlight):
+def printMessage(window, ciphertext, key, index, highlight):
     ''' Print the current message as deciphered by this key.
 
     Args:
@@ -121,9 +110,7 @@ try:
         # Internally, the ciphertext is a continuous list of characters with no
         # non-ascii chars. But, if the original message contains them, we 
         # want to reincorporate them in the final formatted output.
-        ciphertext = f.read().strip()
-        punct = findPunct(ciphertext)
-        ciphertext = [ch for ch in re.sub(r'\W', '', ciphertext)]
+        ciphertext = [ch for ch in f.read().strip()]
 except FileNotFoundError:
     print('cannot open file:', fileName)
     sys.exit(-1)
@@ -141,7 +128,7 @@ def main(stdscr):
     while True:
         # Render calls.
         stdscr.clear()
-        printMessage(stdscr, ciphertext, punct, key, index, not keyMode)
+        printMessage(stdscr, ciphertext, key, index, not keyMode)
         printKey(stdscr, key, index, keyMode)
         stdscr.refresh()
 
