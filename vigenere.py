@@ -117,7 +117,7 @@ def printKey(window, key, index, highlight):
 ####ARG_PARSING################################################################
 
 if len(sys.argv) < 3:
-    print('usage: '+sys.argv[0]+' ciphertext.txt key_length')
+    print('usage: '+sys.argv[0]+' text|file.txt key_length')
     sys.exit(-1)
 
 try:
@@ -130,8 +130,7 @@ try:
     with open(fileName) as f:
         ciphertext = [ch for ch in f.read().strip()]
 except FileNotFoundError:
-    print('cannot open file:', fileName)
-    sys.exit(-1)
+    ciphertext = [ch for ch in sys.argv[1].strip()]
 
 ####MAIN#######################################################################
 
