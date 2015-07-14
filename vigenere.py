@@ -136,7 +136,7 @@ try:
         text = [ch for ch in f.read().strip()]
 # If it isn't openable as a file, then use it as the message itself.
 except FileNotFoundError:
-    text = [ch for ch in sys.argv[1].strip()]
+    text = [ch for ch in sys.argv[2].strip()]
 
 # Parse key mode.
 if sys.argv[3] == '-k':
