@@ -17,6 +17,19 @@ def getPosOfIndex(xs, index):
             r = i
     return r, index - sum(map(len, xs[:r]))
 
+def getIndexOfKey(key, ciphertext, index):
+    """ Return the index in this key being used to decipher ciphertext[index].
+
+    This is necessary since the ciphertext may include non-ascii chars which
+    the key must skip over.
+    """
+    keyIndex, i = 0, 0
+    while i != index:
+        if ciphertext[i].isalpha():
+            keyIndex = (keyIndex + 1) % len(key)
+        i += 1
+    return keyIndex
+
 def offsetIndex(s, i, goRight):
     """ Return the new index on this string after it is offset. """
     offset = 1 if goRight else -1
@@ -153,8 +166,8 @@ def main(stdscr):
                 key[index] = str.upper(chr(ch))
             # Set message to arbitrary character. Key is changed.
             else:
-                # TODO: this doesn't work...
-                key[index%keyLen] = offsetChar(ciphertext[index], ord('a')-ch)
+                keyIndex = getIndexOfKey(key, ciphertext, index)
+                key[keyIndex] = offsetChar(ciphertext[index], ord('a')-ch)
             index = offsetIndex(message, index, True)
 
 wrapper(main)
