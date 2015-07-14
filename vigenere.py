@@ -85,28 +85,34 @@ def printMessage(window, ciphertext, key, index, highlight):
         highlight (bool): should highlighting should be performed?
     """
     h, w = window.getmaxyx()
-    msg = decipher(ciphertext, key)
     # This was really tricky to debug: the total length of a message before
     # and after it is textwrapped MAY NOT be equal since spaces may be removed.
-    wrapped = textwrap.TextWrapper(drop_whitespace=False, width=w).wrap(msg)
+    msg = decipher(ciphertext, key)
+    wrapped = textwrap.TextWrapper(drop_whitespace=False, width=w-4).wrap(msg)
     r, c = getPosFromIndex(wrapped, index)
+
+    subwin = window.subwin(len(wrapped)+2, w, int(h*0.33)-len(wrapped), 0)
+    subwin.box()
 
     #window.addstr(0, 0, str(index)+', '+str((r, c))) # DEBUGGING
 
-    winRow = h//8
+    winRow = 1
     for line in wrapped:
-        window.addstr(winRow, 0, line)
+        subwin.addstr(winRow, 2, line)
         winRow += 1
     if highlight:
-        window.chgat(h//8+r, c, 1, curses.A_STANDOUT)
+        subwin.chgat(r+1, c+2, 1, curses.A_STANDOUT)
 
 def printKey(window, key, index, highlight):
     """ Print the current key. """
-    height, width = window.getmaxyx()
+    h, w = window.getmaxyx()
 
-    window.addstr(height//2, 0, "".join(key))
+    subwin = window.subwin(3, len(key)+4, int(h*0.66), w//2-len(key))
+    subwin.box()
+
+    subwin.addstr(1, 2, "".join(key))
     if highlight:
-        window.chgat(height//2, index, 1, curses.A_STANDOUT)
+        subwin.chgat(1, 2+index, 1, curses.A_STANDOUT)
 
 ####ARG_PARSING################################################################
 
