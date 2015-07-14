@@ -91,7 +91,12 @@ def printMessage(window, text, key, index, highlight):
     wrapped = textwrap.TextWrapper(drop_whitespace=False, width=w-4).wrap(msg)
     r, c = getPosFromIndex(wrapped, index)
 
-    subwin = window.subwin(len(wrapped)+2, w, int(h*0.33)-len(wrapped), 0)
+    try:
+        subwin = window.subwin(len(wrapped)+2, w, int(h*0.33)-len(wrapped), 0)
+    except curses.error:
+        curses.endwin()
+        print('message is too big! shrink it or use a larger terminal size.')
+        sys.exit(-1)
     subwin.box()
 
     #window.addstr(0, 0, str(index)+', '+str((r, c))) # DEBUGGING
@@ -107,7 +112,12 @@ def printKey(window, key, index, highlight):
     """ Print the current key. """
     h, w = window.getmaxyx()
 
-    subwin = window.subwin(3, len(key)+4, int(h*0.66), w//2-len(key))
+    try:
+        subwin = window.subwin(3, len(key)+4, int(h*0.66), w//2-len(key))
+    except curses.error:
+        curses.endwin()
+        print('key is too big! shrink it or use a larger terminal size.')
+        sys.exit(-1)
     subwin.box()
 
     subwin.addstr(1, 2, "".join(key))
