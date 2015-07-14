@@ -211,7 +211,7 @@ def main(stdscr):
             # Set message to arbitrary character. Key is changed.
             else:
                 keyIndex = getIndexOfKey(key, text, index)
-                key[keyIndex] = offsetChar(text[index], ord('a')-ch)
+                key[keyIndex] = offsetChar(text[index], ord('a')-ch).upper()
             index = offsetIndex(message, index, True)
 
 wrapper(main)
