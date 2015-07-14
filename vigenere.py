@@ -180,7 +180,6 @@ def main(stdscr):
         ch = stdscr.getch()
         if ch == 27: # ESCAPE key
             curses.endwin()
-            print(cipher(text, key))
             break
         elif ch == curses.KEY_DOWN and keyMode:
             key[index] = offsetChar(key[index], -1)
@@ -206,3 +205,5 @@ def main(stdscr):
             index = offsetIndex(message, index, True)
 
 wrapper(main)
+# Print out result after exiting interactive mode.
+print(cipher(text, key))
