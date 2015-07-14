@@ -6,7 +6,7 @@ from curses import wrapper # prevents screwing up the terminal on exception
 ####FUNCTIONS##################################################################
 
 def getPosOfIndex(xs, index):
-    ''' Return a (row, col) pair corresponding to an index into a 2D list. '''
+    """ Return a (row, col) pair corresponding to an index into a 2D list. """
     if index < 0 or index >= sum(map(len, xs)):
         return None
 
@@ -18,22 +18,22 @@ def getPosOfIndex(xs, index):
     return r, index - sum(map(len, xs[:r]))
 
 def offsetIndex(s, i, goRight):
-    ''' Return the new index on this string after it is offset. '''
+    """ Return the new index on this string after it is offset. """
     offset = 1 if goRight else -1
     i = (i + offset) % len(s)
-    while not s[i].isalpha():
+    while not s[i].isalpha(): # skip over nonalphabetics
         i = (i + offset) % len(s)
     return i
 
 def offsetChar(ch, offset):
-    ''' Return a character offset forwards or backwards in the alphabet. '''
+    """ Return a character offset forwards or backwards in the alphabet. """
     if not len(ch) == 1 or not ch.isalpha:
         return ch
     base = 'a' if ch.islower() else 'A'
     return chr((ord(ch)-ord(base) + offset) % 26 + ord(base))
 
 def encipher(plaintext, key):
-    ''' Return the ciphertext resulting from this key. '''
+    """ Return the ciphertext resulting from this key. """
     ret = []
 
     key = itertools.cycle(key)
@@ -48,7 +48,7 @@ def encipher(plaintext, key):
     return "".join(ret)
 
 def decipher(ciphertext, key):
-    ''' Return the plaintext resulting from this key. '''
+    """ Return the plaintext resulting from this key. """
     ret = []
 
     key = itertools.cycle(key)
@@ -63,19 +63,19 @@ def decipher(ciphertext, key):
     return "".join(ret)
 
 def printMessage(window, ciphertext, key, index, highlight):
-    ''' Print the current message as deciphered by this key.
+    """ Print the current message as deciphered by this key.
 
     Args:
-        window: curses window to render onto.
-        ciphertext: raw internal ciphertext, represented as a list of str.
-        key: key used for deciphering, represented as a list of str.
-        index: current highlighted character in internal ciphertext.
-        highlight: boolean to decide if highlighting should be performed.
-    '''
+        window (curses.window): curses window to render onto.
+        ciphertext ([str]): ciphertext message.
+        key ([str]): key used for deciphering.
+        index (int): current highlighted character in ciphertext.
+        highlight (bool): should highlighting should be performed?
+    """
     h, w = window.getmaxyx()
     msg = decipher(ciphertext, key)
-    # NB: this was really tricky to debug: the total length of a message before
-    # and after it is textwrapped MAY NOT be equal... Spaces may be removed.
+    # This was really tricky to debug: the total length of a message before
+    # and after it is textwrapped MAY NOT be equal since spaces may be removed.
     wrapped = textwrap.TextWrapper(drop_whitespace=False, width=w).wrap(msg)
     r, c = getPosOfIndex(wrapped, index)
 
@@ -87,7 +87,7 @@ def printMessage(window, ciphertext, key, index, highlight):
         window.chgat(h//8+r, c, 1, curses.A_STANDOUT)
 
 def printKey(window, key, index, highlight):
-    ''' Print the current key. '''
+    """ Print the current key. """
     height, width = window.getmaxyx()
 
     window.addstr(height//2, 0, "".join(key))
@@ -108,9 +108,6 @@ except ValueError:
 
 try:
     with open(fileName) as f:
-        # Internally, the ciphertext is a continuous list of characters with no
-        # non-ascii chars. But, if the original message contains them, we 
-        # want to reincorporate them in the final formatted output.
         ciphertext = [ch for ch in f.read().strip()]
 except FileNotFoundError:
     print('cannot open file:', fileName)
