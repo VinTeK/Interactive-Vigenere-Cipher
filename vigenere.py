@@ -5,17 +5,17 @@ from curses import wrapper # prevents screwing up the terminal on exception
 
 ####FUNCTIONS##################################################################
 
-def getPosOfIndex(xs, index):
+def getPosFromIndex(xss, index):
     """ Return a (row, col) pair corresponding to an index into a 2D list. """
-    if index < 0 or index >= sum(map(len, xs)):
+    if index < 0 or index >= sum(map(len, xss)):
         return None
 
     r, tmp = 0, [0]
-    tmp.extend(itertools.accumulate(map(len, xs)))
+    tmp.extend(itertools.accumulate(map(len, xss)))
     for i in range(len(tmp)-1):
         if index in range(tmp[i], tmp[i+1]):
             r = i
-    return r, index - sum(map(len, xs[:r]))
+    return r, index - sum(map(len, xss[:r]))
 
 def getIndexOfKey(key, ciphertext, index):
     """ Return the index in this key being used to decipher ciphertext[index].
@@ -30,9 +30,8 @@ def getIndexOfKey(key, ciphertext, index):
         i += 1
     return keyIndex
 
-def offsetIndex(s, i, goRight):
+def offsetIndex(s, i, offset):
     """ Return the new index on this string after it is offset. """
-    offset = 1 if goRight else -1
     i = (i + offset) % len(s)
     while not s[i].isalpha(): # skip over nonalphabetics
         i = (i + offset) % len(s)
@@ -90,7 +89,9 @@ def printMessage(window, ciphertext, key, index, highlight):
     # This was really tricky to debug: the total length of a message before
     # and after it is textwrapped MAY NOT be equal since spaces may be removed.
     wrapped = textwrap.TextWrapper(drop_whitespace=False, width=w).wrap(msg)
-    r, c = getPosOfIndex(wrapped, index)
+    r, c = getPosFromIndex(wrapped, index)
+
+    #window.addstr(0, 0, str(index)+', '+str((r, c))) # DEBUGGING
 
     winRow = h//8
     for line in wrapped:
@@ -147,14 +148,14 @@ def main(stdscr):
         ch = stdscr.getch()
         if ch == 27: # ESCAPE key
             break
-        elif ch == curses.KEY_DOWN and keyMode: # TODO: add up/down for cipher
+        elif ch == curses.KEY_DOWN and keyMode:
             key[index] = offsetChar(key[index], -1)
         elif ch == curses.KEY_UP and keyMode:
             key[index] = offsetChar(key[index], 1)
         elif ch == curses.KEY_LEFT:
-            index = offsetIndex(message, index, False)
+            index = offsetIndex(message, index, -1)
         elif ch == curses.KEY_RIGHT:
-            index = offsetIndex(message, index, True)
+            index = offsetIndex(message, index, 1)
         # Toggle between arbitrary key mode and message mode.
         elif ch == ord(' '):
             keyMode = not keyMode
