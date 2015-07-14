@@ -18,10 +18,10 @@ def getPosOfIndex(xs, index):
     return r, index - sum(map(len, xs[:r]))
 
 def offsetIndex(s, i, goRight):
-    ''' Return the new index on this string after an offset. '''
+    ''' Return the new index on this string after it is offset. '''
     offset = 1 if goRight else -1
     i = (i + offset) % len(s)
-    while s[i] == ' ':
+    while not s[i].isalpha():
         i = (i + offset) % len(s)
     return i
 
@@ -68,22 +68,23 @@ def printMessage(window, ciphertext, key, index, highlight):
     Args:
         window: curses window to render onto.
         ciphertext: raw internal ciphertext, represented as a list of str.
-        spaces: list of indices where spaces should be inserted in ciphertext.
         key: key used for deciphering, represented as a list of str.
         index: current highlighted character in internal ciphertext.
         highlight: boolean to decide if highlighting should be performed.
     '''
-    height, width = window.getmaxyx()
-    wrapped = textwrap.wrap(decipher(ciphertext, key), width)
+    h, w = window.getmaxyx()
+    msg = decipher(ciphertext, key)
+    # NB: this was really tricky to debug: the total length of a message before
+    # and after it is textwrapped MAY NOT be equal... Spaces may be removed.
+    wrapped = textwrap.TextWrapper(drop_whitespace=False, width=w).wrap(msg)
     r, c = getPosOfIndex(wrapped, index)
 
-    winRow = height//8
+    winRow = h//8
     for line in wrapped:
         window.addstr(winRow, 0, line)
         winRow += 1
     if highlight:
-        window.addstr(0, 0, str(index)+', ('+str(r)+', '+str(c)+')')
-        window.addch(height//8+r, c, wrapped[r][c], curses.A_STANDOUT)
+        window.chgat(h//8+r, c, 1, curses.A_STANDOUT)
 
 def printKey(window, key, index, highlight):
     ''' Print the current key. '''
@@ -155,7 +156,8 @@ def main(stdscr):
                 key[index] = str.upper(chr(ch))
             # Set message to arbitrary character. Key is changed.
             else:
-                key[index%keyLen] = offsetChar(message[index], ord('a')-ch)
+                # TODO: this doesn't work...
+                key[index%keyLen] = offsetChar(ciphertext[index], ord('a')-ch)
             index = offsetIndex(message, index, True)
 
 wrapper(main)
