@@ -4,7 +4,7 @@ A [Vigenère cipher](https://en.wikipedia.org/wiki/Vigen%C3%A8re_cipher) impleme
 
 Runs on Python 3. Written using the curses library. No additional libraries should need to be installed.
 
-![[Demo](demo.gif)
+![Demo](demo.gif)
 
 ## Usage
 
