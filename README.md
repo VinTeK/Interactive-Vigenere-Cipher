@@ -10,13 +10,11 @@ Runs on Python 3. Written using the curses library. No additional libraries shou
 
 	$ usage: ./vigenere.py -e|-d text|file.txt -k key_string|-l key_length
 
-	-e|-d		Set cipher mode to encryption or decryption.
+**-e | -d**: Set cipher mode to _encryption_ or _decryption_.
 
-	text|file.txt	Filename with message to cipher. If this file cannot be opened, this argument is interpreted as the message itself.
+**text | file.txt**: Filename with message to cipher. If this file cannot be opened, this argument is interpreted as the message itself.
 
-	-k key_string	Use key_string to cipher the message.
-
-	-l key_length	Run in interactive mode using this a key of length key_length.
+**-k key_string | -l key_length**: Use either a _key_string_ to cipher the message or enter interactive mode with a key of length _key_length_.
 
 ## Keyboard shortcuts
 
@@ -26,11 +24,10 @@ Runs on Python 3. Written using the curses library. No additional libraries shou
 
 **SPACE** -- Switch between the key and the message.
 
-**[A,B,C,...]** -- You can enter whatever text you like to change either the key or message. When you change the key, the message is ciphered accordingly; when you change the message, the key is changed to cipher to that character.
+**[A, B, C, ...]** -- You can enter whatever text you like to change either the key or message. When you change the key, the message is ciphered accordingly; when you change the message, the key is changed to cipher to that character.
 
 ## Examples
 
 	$ ./vigenere.py -d 'tiulvxlsfimgccqlvhnenkmgw' -k 'secret'
 
 	$ ./vigenere.py -e 'plaintext.txt' -l 9
-
