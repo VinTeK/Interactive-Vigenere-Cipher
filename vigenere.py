@@ -186,6 +186,10 @@ try:
 except FileNotFoundError:
     text = [ch for ch in sys.argv[2].strip()]
 
+if not text:
+    print('your message must be at least one character')
+    sys.exit(-1)
+
 # Parse key mode.
 if sys.argv[3] == '-k':
     keyLenMode = False
