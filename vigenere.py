@@ -146,9 +146,9 @@ def printAnalysis(window, text):
             s += toAppend
         return s
 
-    uniStr  = helper(uni,   'unigrams: '+str(uni[0][0])+'*'+str(uni[0][1]))
-    biStr   = helper(bi,    'bigrams:  '+str(bi[0][0])+'*'+str(bi[0][1]))
-    triStr  = helper(tri,   'trigrams: '+str(tri[0][0])+'*'+str(tri[0][1]))
+    uniStr=helper(uni, 'unigrams: '+str(uni[0][0])+'*'+str(uni[0][1]))
+    if bi: biStr=helper(bi, 'bigrams:  '+str(bi[0][0])+'*'+str(bi[0][1]))
+    if tri: triStr=helper(tri, 'trigrams: '+str(tri[0][0])+'*'+str(tri[0][1]))
 
     try:
         subwin = window.subwin(5, w, h-5, 0)
@@ -159,8 +159,8 @@ def printAnalysis(window, text):
     subwin.box()
 
     subwin.addstr(1, 2, uniStr)
-    subwin.addstr(2, 2, biStr)
-    subwin.addstr(3, 2, triStr)
+    if bi: subwin.addstr(2, 2, biStr)
+    if tri: subwin.addstr(3, 2, triStr)
 
 ####ARG_PARSING################################################################
 
