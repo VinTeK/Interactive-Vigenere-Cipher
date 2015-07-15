@@ -101,7 +101,6 @@ def printMessage(window, text, key, index, highlight):
     # and after it is textwrapped MAY NOT be equal since spaces may be removed.
     msg = cipher(text, key)
     wrap = textwrap.TextWrapper(drop_whitespace=False, width=w-4).wrap(msg)
-    r, c = getPosFromIndex(wrap, index)
 
     vigenere = itertools.cycle(key)
     keyWrap = wrap[:]
@@ -123,7 +122,8 @@ def printMessage(window, text, key, index, highlight):
         subwin.addstr(winRow, 2, msgLine, curses.A_BOLD)
         winRow += 2
     if highlight:
-        subwin.chgat(r+2, c+2, 1, curses.A_STANDOUT)
+        r, c = getPosFromIndex(wrap, index)
+        subwin.chgat(r*2+2, c+2, 1, curses.A_STANDOUT)
 
 def printKey(window, key, index, highlight):
     """ Print the current key. """
