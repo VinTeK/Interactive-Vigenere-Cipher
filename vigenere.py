@@ -123,7 +123,7 @@ def printMessage(window, text, key, index, highlight):
         subwin.addstr(winRow, 2, msgLine, curses.A_BOLD)
         winRow += 2
     if highlight:
-        subwin.chgat(r+1, c+2, 1, curses.A_STANDOUT)
+        subwin.chgat(r+2, c+2, 1, curses.A_STANDOUT)
 
 def printKey(window, key, index, highlight):
     """ Print the current key. """
