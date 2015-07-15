@@ -96,24 +96,32 @@ def printMessage(window, text, key, index, highlight):
         highlight (bool): should highlighting should be performed?
     """
     h, w = window.getmaxyx()
+
     # This was really tricky to debug: the total length of a message before
     # and after it is textwrapped MAY NOT be equal since spaces may be removed.
     msg = cipher(text, key)
     wrap = textwrap.TextWrapper(drop_whitespace=False, width=w-4).wrap(msg)
     r, c = getPosFromIndex(wrap, index)
 
+    vigenere = itertools.cycle(key)
+    keyWrap = wrap[:]
+    for i in range(len(keyWrap)):
+        tmp = [next(vigenere) if ch.isalpha() else ch for ch in keyWrap[i]]
+        keyWrap[i] = ''.join(tmp)
+
     try:
-        subwin = window.subwin(len(wrap)+2, w, int(h*0.33)-len(wrap)+3, 0)
+        subwin = window.subwin(len(wrap)*2+2, w, int(h*0.33)-len(wrap)*2+3, 0)
     except curses.error:
         curses.endwin()
         print('message is too big! shrink it or use a larger terminal size.')
         sys.exit(-1)
     subwin.box()
 
-    winRow = 1
-    for line in wrap:
-        subwin.addstr(winRow, 2, line)
-        winRow += 1
+    winRow = 2
+    for msgLine, keyLine in zip(wrap, keyWrap):
+        subwin.addstr(winRow-1, 2, keyLine, curses.A_DIM)
+        subwin.addstr(winRow, 2, msgLine, curses.A_BOLD)
+        winRow += 2
     if highlight:
         subwin.chgat(r+1, c+2, 1, curses.A_STANDOUT)
 
