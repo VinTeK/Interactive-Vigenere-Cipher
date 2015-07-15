@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-import curses, itertools, re, string, sys, textwrap
+import collections, curses, itertools, re, string, sys, textwrap
 from curses import wrapper # prevents screwing up the terminal on exception
 
 ####FUNCTIONS##################################################################
@@ -74,6 +74,17 @@ def decipher(ciphertext, key):
         ret.append(p)
     return "".join(ret)
 
+def freqAnalysis(text):
+    """ Return the ten most common unigrams, bigrams, and trigrams. """
+    text = re.sub(r'\W', '', text)
+    n = 10
+
+    uni = collections.Counter(text)
+    bi = collections.Counter([text[i:i+2] for i in range(len(text)-1)])
+    tri = collections.Counter([text[i:i+3] for i in range(len(text)-2)])
+
+    return uni.most_common(n), bi.most_common(n), tri.most_common(n)
+
 def printMessage(window, text, key, index, highlight):
     """ Print the current message as deciphered by this key.
 
@@ -88,21 +99,19 @@ def printMessage(window, text, key, index, highlight):
     # This was really tricky to debug: the total length of a message before
     # and after it is textwrapped MAY NOT be equal since spaces may be removed.
     msg = cipher(text, key)
-    wrapped = textwrap.TextWrapper(drop_whitespace=False, width=w-4).wrap(msg)
-    r, c = getPosFromIndex(wrapped, index)
+    wrap = textwrap.TextWrapper(drop_whitespace=False, width=w-4).wrap(msg)
+    r, c = getPosFromIndex(wrap, index)
 
     try:
-        subwin = window.subwin(len(wrapped)+2, w, int(h*0.33)-len(wrapped), 0)
+        subwin = window.subwin(len(wrap)+2, w, int(h*0.33)-len(wrap)+3, 0)
     except curses.error:
         curses.endwin()
         print('message is too big! shrink it or use a larger terminal size.')
         sys.exit(-1)
     subwin.box()
 
-    #window.addstr(0, 0, str(index)+', '+str((r, c))) # DEBUGGING
-
     winRow = 1
-    for line in wrapped:
+    for line in wrap:
         subwin.addstr(winRow, 2, line)
         winRow += 1
     if highlight:
@@ -123,6 +132,35 @@ def printKey(window, key, index, highlight):
     subwin.addstr(1, 2, "".join(key))
     if highlight:
         subwin.chgat(1, 2+index, 1, curses.A_STANDOUT)
+
+def printAnalysis(window, text):
+    """ Print out frequency analysis of message. """
+    uni, bi, tri = freqAnalysis(''.join(text))
+    h, w = window.getmaxyx()
+
+    # Try to add as much frequency analysis information that fits the window.
+    def helper(tally, s):
+        for gram, num in tally[1:]:
+            toAppend = ', '+str(gram)+'*'+str(num)
+            if len(s) + len(toAppend) > w-4: break
+            s += toAppend
+        return s
+
+    uniStr  = helper(uni,   'unigrams: '+str(uni[0][0])+'*'+str(uni[0][1]))
+    biStr   = helper(bi,    'bigrams:  '+str(bi[0][0])+'*'+str(bi[0][1]))
+    triStr  = helper(tri,   'trigrams: '+str(tri[0][0])+'*'+str(tri[0][1]))
+
+    try:
+        subwin = window.subwin(5, w, h-5, 0)
+    except curses.error:
+        curses.endwin()
+        print('could not fit analysis window! use larger terminal size.')
+        sys.exit(-1)
+    subwin.box()
+
+    subwin.addstr(1, 2, uniStr)
+    subwin.addstr(2, 2, biStr)
+    subwin.addstr(3, 2, triStr)
 
 ####ARG_PARSING################################################################
 
@@ -184,6 +222,7 @@ def main(stdscr):
         stdscr.clear()
         printMessage(stdscr, text, key, index, not keyMode)
         printKey(stdscr, key, index, keyMode)
+        printAnalysis(stdscr, text)
         stdscr.refresh()
 
         # Input parsing.
