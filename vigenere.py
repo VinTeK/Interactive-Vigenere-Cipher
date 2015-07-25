@@ -114,7 +114,7 @@ def printMessage(window, text, key, index, highlight):
         curses.endwin()
         print('message is too big! shrink it or use a larger terminal size.')
         sys.exit(-1)
-    subwin.box()
+    subwin.border(ord('|'), ord('|'), ord('-'), ord('-'), *[ord('+')]*4)
 
     winRow = 2
     for msgLine, keyLine in zip(wrap, keyWrap):
@@ -135,7 +135,7 @@ def printKey(window, key, index, highlight):
         curses.endwin()
         print('key is too big! shrink it or use a larger terminal size.')
         sys.exit(-1)
-    subwin.box()
+    subwin.border(ord('|'), ord('|'), ord('-'), ord('-'), *[ord('+')]*4)
 
     subwin.addstr(1, 2, "".join(key))
     if highlight:
@@ -164,7 +164,7 @@ def printAnalysis(window, text):
         curses.endwin()
         print('could not fit analysis window! use larger terminal size.')
         sys.exit(-1)
-    subwin.box()
+    subwin.border(ord('|'), ord('|'), ord('-'), ord('-'), *[ord('+')]*4)
 
     subwin.addstr(1, 2, uniStr)
     if bi: subwin.addstr(2, 2, biStr)
